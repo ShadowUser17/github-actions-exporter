@@ -1,0 +1,4 @@
+flake8
+pygithub
+pip-audit
+prometheus-client
