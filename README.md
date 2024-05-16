@@ -17,5 +17,6 @@ python3 -m venv --upgrade-deps env && \
 ```
 
 #### Dependencies:
+- [Flask](https://github.com/pallets/flask)
 - [PyGithub](https://github.com/PyGithub/PyGithub)
 - [prometheus-client](https://github.com/prometheus/client_python)
