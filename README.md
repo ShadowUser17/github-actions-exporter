@@ -16,7 +16,7 @@ python3 -m venv --upgrade-deps env && \
 ./env/bin/flake8 --ignore="E501" *.py
 ```
 
-#### How to manually run exporter:
+#### Run exporter manually:
 ```bash
 export DEBUG_MODE=""
 export HTTP_ADDR="127.0.0.1"
