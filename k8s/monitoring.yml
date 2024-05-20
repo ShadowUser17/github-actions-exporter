@@ -1,0 +1,14 @@
+apiVersion: "monitoring.coreos.com/v1"
+kind: "PodMonitor"
+metadata:
+  name: "github-actions-exporter"
+  labels:
+    release: "prom-operator"
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "github-actions-exporter"
+  podMetricsEndpoints:
+    - port: "http"
+      interval: "1m"
+      honorLabels: true

@@ -73,6 +73,17 @@ export AWS_SECRET_ACCESS_KEY=""
 docker logout "${AWS_ECR_NAME}"
 ```
 
+#### Deploy to K8S:
+```bash
+kubectl create ns testing
+```
+```bash
+kubectl apply -f k8s/deploy.yml -n testing
+```
+```bash
+kubectl apply -f k8s/monitoring.yml -n testing
+```
+
 #### Dependencies:
 - [PyGithub](https://github.com/PyGithub/PyGithub)
 - [prometheus-client](https://github.com/prometheus/client_python)
