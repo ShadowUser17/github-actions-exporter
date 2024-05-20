@@ -1,3 +1,4 @@
+boto3
 flake8
 pygithub
 pip-audit

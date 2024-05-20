@@ -42,6 +42,22 @@ docker login -u "${DOCKERHUB_LOGIN}" -p "${DOCKERHUB_TOKEN}"
 docker push "shadowuser17/github-actions-exporter:latest"
 ```
 
+#### Publish docker image to AWS/ECR:
+```bash
+export IMAGE_NAME=""
+export IMAGE_TAG=""
+export AWS_ECR_NAME=""
+export AWS_DEFAULT_REGION=""
+export AWS_ACCESS_KEY_ID=""
+export AWS_SECRET_ACCESS_KEY=""
+```
+```bash
+./env/bin/python3 push_aws_ecr.py
+```
+```bash
+docker logout "${AWS_ECR_NAME}"
+```
+
 #### Dependencies:
 - [PyGithub](https://github.com/PyGithub/PyGithub)
 - [prometheus-client](https://github.com/prometheus/client_python)
