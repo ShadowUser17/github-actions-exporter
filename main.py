@@ -7,6 +7,7 @@ import traceback
 from github import Auth
 from github import Github
 from github.Repository import Repository
+from github.WorkflowRun import WorkflowRun
 from github.Organization import Organization
 
 from prometheus_client import Gauge
@@ -22,16 +23,14 @@ from prometheus_client import start_http_server
 # GITHUB_RUNS_STATUS
 
 
-def get_org_repos_list(org: Organization, repos_type: str) -> list:
+def get_org_repos_list(org: Organization, repos_type: str) -> list[Repository]:
     logging.debug("get_org_repos_list({}, {})".format(type(client), repos_type))
-    repos = org.get_repos(type=repos_type)
-    return [item for item in repos]
+    return list(org.get_repos(type=repos_type))
 
 
-def get_repo_workflow_runs_list(repo: Repository, status: str) -> list:
+def get_repo_workflow_runs_list(repo: Repository, status: str) -> list[WorkflowRun]:
     logging.debug("get_repo_workflow_runs_list({}, {})".format(type(repo), status))
-    runs = repo.get_workflow_runs(status=status)
-    return [item for item in runs]
+    return list(repo.get_workflow_runs(status=status))
 
 
 try:
