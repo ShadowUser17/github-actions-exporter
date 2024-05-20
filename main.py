@@ -54,7 +54,7 @@ try:
     start_http_server(addr=http_addr, port=http_port)
     logging.debug("Start HTTP server: {}:{}".format(http_addr, http_port))
 
-    scrape_int = float(os.environ.get("SCRAPE_INTERVAL", "60"))
+    scrape_int = float(os.environ.get("SCRAPE_INTERVAL", "120"))
     github_repo_workflow_runs = Gauge(
         name="github_repo_workflow_runs",
         labelnames=["repo", "status", "conclusion"],
@@ -63,6 +63,7 @@ try:
 
     logging.debug("Start main loop...")
     while True:
+        github_repo_workflow_runs.clear()
         for repo in get_org_repos_list(org=org, repos_type=github_repos_type):
             for job in get_repo_workflow_runs_list(repo=repo, status=github_runs_status):
                 github_repo_workflow_runs.labels(
