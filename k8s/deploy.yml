@@ -55,10 +55,6 @@ spec:
               value: ""
             - name: "SCRAPE_INTERVAL"
               value: "120"
-            - name: "GITHUB_REPOS_TYPE"
-              value: "sources"
-            - name: "GITHUB_RUNS_STATUS"
-              value: ""
           ports:
             - name: "http"
               protocol: "TCP"
