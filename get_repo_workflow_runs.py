@@ -22,11 +22,11 @@ def get_github_org(client: Github, org: str = "") -> Organization:
     return client.get_organization(os.environ.get("GITHUB_ORG", org))
 
 
-def get_github_repo_list(org: Organization, repos_type: str = "") -> list[Repository]:
+def get_github_repos(org: Organization, repos_type: str = "") -> list[Repository]:
     return list(org.get_repos(type=repos_type))
 
 
-def get_repo_workflow_runs_list(repo: Repository, status: str = "") -> list[WorkflowRun]:
+def get_github_repo_workflow_runs(repo: Repository, status: str = "") -> list[WorkflowRun]:
     return list(repo.get_workflow_runs(status=status))
 
 
@@ -45,8 +45,8 @@ try:
     args = parse_args()
     org = get_github_org(client=get_github_client(token=args.token), org=args.org)
 
-    for repo in get_github_repo_list(org=org, repos_type=args.type):
-        for run in get_repo_workflow_runs_list(repo=repo, status=args.status):
+    for repo in get_github_repos(org=org, repos_type=args.type):
+        for run in get_github_repo_workflow_runs(repo=repo, status=args.status):
             print("{}: ({}: {}/{})".format(repo.name, run.name, run.status, run.conclusion))
 
 except Exception:
