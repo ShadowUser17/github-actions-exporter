@@ -3,6 +3,7 @@ import sys
 import time
 import queue
 import logging
+import datetime
 import threading
 import traceback
 
@@ -66,27 +67,25 @@ def start_http_endpoint(http_addr: str = "127.0.0.1", http_port: str = "8080") -
     start_http_server(addr=http_addr, port=int(http_port))
 
 
-def start_repos_worker(org: Organization, repos: queue.Queue, scrape_int: float) -> None:
+def start_repos_worker(org: Organization, repos: queue.Queue, metrics: dict, scrape_int: float) -> None:
     logging.debug("start_repos_worker({}, {}, {})".format(org, repos, scrape_int))
     while True:
+        for key in metrics:
+            metrics[key].clear()
+
         for repo in get_github_repos(org, "sources"):
             repos.put(repo)
 
+        repos.join()
         time.sleep(scrape_int)
 
 
-def start_workflows_worker(repos: queue.Queue, workflows: queue.Queue) -> None:
+def start_workflows_worker(repos: queue.Queue, workflows: queue.Queue, metrics: dict) -> None:
     logging.debug("start_workflows_worker({})".format(repos))
-    github_repo_workflows = Gauge(
-        name="github_repo_workflows",
-        labelnames=["workflow_id", "repo", "name", "state"],
-        documentation="Information of repository workflows."
-    )
+    github_repo_workflows = metrics.get("github_repo_workflows")
 
     while True:
         repo = repos.get()
-        github_repo_workflows.clear()
-
         for workflow in get_github_repo_workflows(repo):
             if workflow.state == "active":
                 workflows.put(workflow)
@@ -102,26 +101,24 @@ def start_workflows_worker(repos: queue.Queue, workflows: queue.Queue) -> None:
         time.sleep(1)
 
 
-def start_workflow_runs_worker(workflows: queue.Queue) -> None:
+def start_workflow_runs_worker(workflows: queue.Queue, metrics: dict) -> None:
     logging.debug("start_workflow_runs_worker({})".format(workflows))
-    github_repo_workflow_runs = Gauge(
-        name="github_repo_workflow_runs",
-        labelnames=["run_id", "name", "status", "conclusion", "workflow_id"],
-        documentation="Information of workflow runs."
-    )
+    github_repo_workflow_runs = metrics.get("github_repo_workflow_runs")
 
     while True:
         workflow = workflows.get()
-        github_repo_workflow_runs.clear()
+        oldest = (datetime.datetime.now() - datetime.timedelta(hours=1))
 
         for run in get_github_workflow_runs(workflow):
-            github_repo_workflow_runs.labels(
-                run_id=run.id,
-                name=run.name,
-                status=run.status,
-                conclusion=run.conclusion,
-                workflow_id=run.workflow_id
-            ).set(1)
+            if run.run_started_at.timestamp() > oldest.timestamp():
+                github_repo_workflow_runs.labels(
+                    run_id=run.id,
+                    name=run.name,
+                    repo=run.repository.name,
+                    status=run.status,
+                    conclusion=run.conclusion,
+                    workflow_id=run.workflow_id
+                ).set(1)
 
         workflows.task_done()
         time.sleep(1)
@@ -130,16 +127,29 @@ def start_workflow_runs_worker(workflows: queue.Queue) -> None:
 try:
     configure_logger()
     org = get_github_org(client=get_github_client())
-    scrape_int = float(os.environ.get("SCRAPE_INTERVAL", "120"))
+    scrape_int = float(os.environ.get("SCRAPE_INTERVAL", "300"))
+
+    metrics = {
+        "github_repo_workflows": Gauge(
+            name="github_repo_workflows",
+            labelnames=["workflow_id", "repo", "name", "state"],
+            documentation="Information of repository workflows."
+        ),
+        "github_repo_workflow_runs": Gauge(
+            name="github_repo_workflow_runs",
+            labelnames=["run_id", "name", "repo", "status", "conclusion", "workflow_id"],
+            documentation="Information of workflow runs."
+        )
+    }
 
     workers = []
     repos = queue.Queue()
     workflows = queue.Queue()
 
     start_http_endpoint()
-    workers.append(threading.Thread(target=start_repos_worker, args=(org, repos, scrape_int,)))
-    workers.append(threading.Thread(target=start_workflows_worker, args=(repos, workflows,)))
-    workers.append(threading.Thread(target=start_workflow_runs_worker, args=(workflows,)))
+    workers.append(threading.Thread(target=start_repos_worker, args=(org, repos, metrics, scrape_int,)))
+    workers.append(threading.Thread(target=start_workflows_worker, args=(repos, workflows, metrics,)))
+    workers.append(threading.Thread(target=start_workflow_runs_worker, args=(workflows, metrics,)))
 
     for thr in workers:
         thr.start()

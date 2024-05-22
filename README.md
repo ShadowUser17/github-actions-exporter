@@ -23,7 +23,6 @@ export HTTP_ADDR="127.0.0.1"
 export HTTP_PORT="8080"
 export GITHUB_ORG=""
 export GITHUB_TOKEN=""
-export SCRAPE_INTERVAL="120"
 ```
 ```bash
 ./env/bin/python3 main.py
