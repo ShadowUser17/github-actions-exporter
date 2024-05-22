@@ -85,8 +85,11 @@ def start_workflows_worker(repos: queue.Queue, workflows: queue.Queue) -> None:
 
     while True:
         repo = repos.get()
+        github_repo_workflows.clear()
+
         for workflow in get_github_repo_workflows(repo):
-            workflows.put(workflow)
+            if workflow.state == "active":
+                workflows.put(workflow)
 
             github_repo_workflows.labels(
                 workflow_id=workflow.id,
@@ -109,6 +112,8 @@ def start_workflow_runs_worker(workflows: queue.Queue) -> None:
 
     while True:
         workflow = workflows.get()
+        github_repo_workflow_runs.clear()
+
         for run in get_github_workflow_runs(workflow):
             github_repo_workflow_runs.labels(
                 run_id=run.id,
