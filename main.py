@@ -45,9 +45,9 @@ def get_github_repo_workflows(repo: Repository) -> list[Workflow]:
     return list(repo.get_workflows())
 
 
-def get_github_workflow_runs(workflow: Workflow, status: str = "") -> list[WorkflowRun]:
+def get_github_workflow_runs(workflow: Workflow, status: str = "", created: str = "") -> list[WorkflowRun]:
     logging.debug("get_github_workflow_runs({}, {})".format(workflow, status))
-    return list(workflow.get_runs(status=status))
+    return list(workflow.get_runs(status=status, created=created))
 
 
 def configure_logger() -> None:
@@ -107,18 +107,17 @@ def start_workflow_runs_worker(workflows: queue.Queue, metrics: dict) -> None:
 
     while True:
         workflow = workflows.get()
-        oldest = (datetime.datetime.now() - datetime.timedelta(hours=1))
+        now = datetime.datetime.now()
 
-        for run in get_github_workflow_runs(workflow):
-            if run.run_started_at.timestamp() > oldest.timestamp():
-                github_repo_workflow_runs.labels(
-                    run_id=run.id,
-                    name=run.name,
-                    repo=run.repository.name,
-                    status=run.status,
-                    conclusion=run.conclusion,
-                    workflow_id=run.workflow_id
-                ).set(1)
+        for run in get_github_workflow_runs(workflow, created=now.strftime(r"%Y-%m-%d")):
+            github_repo_workflow_runs.labels(
+                run_id=run.id,
+                name=run.name,
+                repo=run.repository.name,
+                status=run.status,
+                conclusion=run.conclusion,
+                workflow_id=run.workflow_id
+            ).set(1)
 
         workflows.task_done()
         time.sleep(1)
