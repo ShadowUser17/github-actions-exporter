@@ -2,10 +2,18 @@ apiVersion: "monitoring.coreos.com/v1"
 kind: "PrometheusRule"
 metadata:
   name: "github-action-rules"
-  namespace: "monitoring"
   labels:
     release: "prom-operator"
 spec:
   groups:
     - name: "github-actions.rules"
-      rules: []
+      rules:
+        - alert: "GitHubWorkflowRunQueued"
+          expr: 'sum(github_repo_workflow_runs{status="queued"}) by(name, repo, conclusion, status) == 1'
+          for: "15m"
+          labels:
+            severity: "warning"
+          annotations:
+            summary: 'The {{ $labels.repo }}: "{{ $labels.name }}" in ({{ $labels.status }}/{{ $labels.conclusion }}) status.'
+            description: 'The {{ $labels.repo }}: "{{ $labels.name }}" in ({{ $labels.status }}/{{ $labels.conclusion }}) status.'
+            # runbook_url: ""
