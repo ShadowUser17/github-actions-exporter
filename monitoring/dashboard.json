@@ -282,41 +282,14 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
           "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
+            "align": "left",
+            "cellOptions": {
+              "type": "auto"
             },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": true,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "inspect": false
           },
           "mappings": [],
           "min": 0,
@@ -335,24 +308,25 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 24,
         "x": 0,
         "y": 8
       },
       "id": 1,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "right",
-          "showLegend": true
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
         },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+        "showHeader": true
       },
+      "pluginVersion": "10.1.10",
       "targets": [
         {
           "datasource": {
@@ -360,15 +334,81 @@
             "uid": "${source}"
           },
           "editorMode": "code",
-          "expr": "sum(github_repo_workflow_runs{repo=~\"${repo}\", status=~\"${status}\", conclusion=~\"${conclusion}\"}) by(name)",
+          "exemplar": false,
+          "expr": "sum(\n  github_repo_workflow_runs{repo=~\"${repo}\", status=~\"${status}\", conclusion=~\"${conclusion}\"}\n) by(name, repo, status, conclusion)",
+          "format": "table",
           "instant": false,
-          "legendFormat": "{{name}}",
+          "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
       "title": "GitHub workflow run status",
-      "type": "timeseries"
+      "transformations": [
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Time": {
+                "aggregations": [
+                  "lastNotNull"
+                ]
+              },
+              "Value": {
+                "aggregations": [
+                  "lastNotNull"
+                ],
+                "operation": "aggregate"
+              },
+              "conclusion": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "name": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "repo": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "status": {
+                "aggregations": [],
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": false,
+              "Value": false
+            },
+            "indexByName": {
+              "Value (lastNotNull)": 4,
+              "conclusion": 2,
+              "name": 1,
+              "repo": 0,
+              "status": 3
+            },
+            "renameByName": {
+              "Time": "Time",
+              "Time (last)": "Time",
+              "Time (lastNotNull)": "Time",
+              "Value": "Value",
+              "Value (lastNotNull)": "Total",
+              "Value (sum)": "",
+              "conclusion": "Conclusion",
+              "name": "Workflow",
+              "repo": "Repository",
+              "status": "Status"
+            }
+          }
+        }
+      ],
+      "type": "table"
     }
   ],
   "refresh": "",
@@ -431,7 +471,7 @@
       {
         "allValue": ".*",
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "All",
           "value": "$__all"
         },
@@ -494,6 +534,6 @@
   "timezone": "",
   "title": "GitHub Actions Exporter",
   "uid": "b2c7d375-86ab-4262-9b27-106056068a57",
-  "version": 23,
+  "version": 26,
   "weekStart": ""
 }
