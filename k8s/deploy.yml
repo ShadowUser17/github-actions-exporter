@@ -53,6 +53,10 @@ spec:
               value: ""
             - name: "GITHUB_TOKEN"
               value: ""
+            - name: "THREAD_COUNT"
+              value: "2"
+            - name: "SCRAPE_INTERVAL"
+              value: "300"
           ports:
             - name: "http"
               protocol: "TCP"

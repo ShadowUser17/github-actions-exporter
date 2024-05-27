@@ -22,6 +22,7 @@ from prometheus_client import start_http_server
 # HTTP_PORT
 # GITHUB_ORG
 # GITHUB_TOKEN
+# THREAD_COUNT
 # SCRAPE_INTERVAL
 
 
@@ -124,6 +125,7 @@ def start_workflow_runs_worker(workflows: queue.Queue, metrics: dict) -> None:
 try:
     configure_logger()
     org = get_github_org(client=get_github_client())
+    thread_count = int(os.environ.get("THREAD_COUNT", 2))
     scrape_int = float(os.environ.get("SCRAPE_INTERVAL", "300"))
 
     metrics = {
@@ -145,8 +147,12 @@ try:
 
     start_http_endpoint()
     workers.append(threading.Thread(target=start_repos_worker, args=(org, repos, metrics, scrape_int,)))
-    workers.append(threading.Thread(target=start_workflows_worker, args=(repos, workflows, metrics,)))
-    workers.append(threading.Thread(target=start_workflow_runs_worker, args=(workflows, metrics,)))
+
+    for _ in range(0, thread_count):
+        workers.append(threading.Thread(target=start_workflows_worker, args=(repos, workflows, metrics,)))
+
+    for _ in range(0, thread_count):
+        workers.append(threading.Thread(target=start_workflow_runs_worker, args=(workflows, metrics,)))
 
     for thr in workers:
         thr.start()
