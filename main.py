@@ -104,6 +104,7 @@ def start_workflows_worker(repos: queue.Queue, workflows: queue.Queue, metrics: 
 def start_workflow_runs_worker(workflows: queue.Queue, metrics: dict) -> None:
     logging.debug("start_workflow_runs_worker({})".format(workflows))
     github_repo_workflow_runs = metrics.get("github_repo_workflow_runs")
+    github_repo_workflow_run_created = metrics.get("github_repo_workflow_run_created")
 
     while True:
         workflow = workflows.get()
@@ -118,6 +119,13 @@ def start_workflow_runs_worker(workflows: queue.Queue, metrics: dict) -> None:
                 conclusion=run.conclusion,
                 workflow_id=run.workflow_id
             ).set(1)
+
+            github_repo_workflow_run_created.labels(
+                run_id=run.id,
+                name=run.name,
+                repo=run.repository.name,
+                workflow_id=run.workflow_id
+            ).set(run.created_at.timestamp())
 
         workflows.task_done()
 
@@ -138,6 +146,11 @@ try:
             name="github_repo_workflow_runs",
             labelnames=["run_id", "name", "repo", "status", "conclusion", "workflow_id"],
             documentation="Information of workflow runs."
+        ),
+        "github_repo_workflow_run_created": Gauge(
+            name="github_repo_workflow_run_created",
+            labelnames=["run_id", "name", "repo", "workflow_id"],
+            documentation="Information of workflow run creation."
         )
     }
 
