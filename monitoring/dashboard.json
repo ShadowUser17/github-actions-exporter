@@ -335,7 +335,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(\n  github_repo_workflow_runs{repo=~\"${repo}\", status=~\"${status}\", conclusion=~\"${conclusion}\"}\n) by(name, repo, status, conclusion)",
+          "expr": "sum(\n  github_repo_workflow_runs{repo=~\"${repo}\", status=~\"${status}\", conclusion=~\"${conclusion}\"}\n) by(run_id, name, repo, status, conclusion)",
           "format": "table",
           "instant": false,
           "legendFormat": "__auto",
@@ -372,6 +372,10 @@
                 "aggregations": [],
                 "operation": "groupby"
               },
+              "run_id": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
               "status": {
                 "aggregations": [],
                 "operation": "groupby"
@@ -387,11 +391,12 @@
               "Value": false
             },
             "indexByName": {
-              "Value (lastNotNull)": 4,
-              "conclusion": 2,
-              "name": 1,
-              "repo": 0,
-              "status": 3
+              "Value (lastNotNull)": 5,
+              "conclusion": 3,
+              "name": 2,
+              "repo": 1,
+              "run_id": 0,
+              "status": 4
             },
             "renameByName": {
               "Time": "Time",
@@ -403,6 +408,7 @@
               "conclusion": "Conclusion",
               "name": "Workflow",
               "repo": "Repository",
+              "run_id": "Id",
               "status": "Status"
             }
           }
@@ -534,6 +540,6 @@
   "timezone": "",
   "title": "GitHub Actions Exporter",
   "uid": "b2c7d375-86ab-4262-9b27-106056068a57",
-  "version": 26,
+  "version": 27,
   "weekStart": ""
 }
