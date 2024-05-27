@@ -98,7 +98,6 @@ def start_workflows_worker(repos: queue.Queue, workflows: queue.Queue, metrics: 
             ).set(1)
 
         repos.task_done()
-        time.sleep(1)
 
 
 def start_workflow_runs_worker(workflows: queue.Queue, metrics: dict) -> None:
@@ -120,7 +119,6 @@ def start_workflow_runs_worker(workflows: queue.Queue, metrics: dict) -> None:
             ).set(1)
 
         workflows.task_done()
-        time.sleep(1)
 
 
 try:
