@@ -30,70 +30,38 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "palette-classic"
           },
-          "mappings": [],
-          "min": 0,
-          "noValue": "0",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "orange",
-                "value": null
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 0,
-        "y": 0
-      },
-      "id": 2,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "10.1.10",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${source}"
-          },
-          "editorMode": "code",
-          "expr": "sum(github_repo_workflow_runs{status=\"queued\"})",
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Queued runs",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${source}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
           "min": 0,
@@ -113,24 +81,23 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 6,
-        "x": 6,
+        "w": 18,
+        "x": 0,
         "y": 0
       },
-      "id": 3,
+      "id": 7,
       "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
         },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
-      "pluginVersion": "10.1.10",
       "targets": [
         {
           "datasource": {
@@ -138,15 +105,15 @@
             "uid": "${source}"
           },
           "editorMode": "code",
-          "expr": "sum(github_repo_workflow_runs{status=\"in_progress\"})",
+          "expr": "sum(github_repo_workflow_runs{status=\"queued\"}) by(run_id, name, repo)",
           "instant": false,
-          "legendFormat": "__auto",
+          "legendFormat": "{{run_id}} - {{repo}} - \"{{name}}\"",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "In progress runs",
-      "type": "gauge"
+      "title": "GitHub workflow queued runs",
+      "type": "timeseries"
     },
     {
       "datasource": {
@@ -177,7 +144,7 @@
       "gridPos": {
         "h": 8,
         "w": 6,
-        "x": 12,
+        "x": 18,
         "y": 0
       },
       "id": 6,
@@ -209,69 +176,6 @@
         }
       ],
       "title": "Failure runs",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${source}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "min": 0,
-          "noValue": "0",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 18,
-        "y": 0
-      },
-      "id": 5,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "10.1.10",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${source}"
-          },
-          "editorMode": "code",
-          "expr": "sum(github_repo_workflow_runs{conclusion=\"success\"})",
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Success runs",
       "type": "gauge"
     },
     {
@@ -333,11 +237,11 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 24,
+        "w": 18,
         "x": 0,
         "y": 8
       },
-      "id": 7,
+      "id": 8,
       "options": {
         "legend": {
           "calcs": [],
@@ -357,15 +261,78 @@
             "uid": "${source}"
           },
           "editorMode": "code",
-          "expr": "sum(\n  github_repo_workflow_runs{repo=~\"${repo}\", status=~\"${status}\", conclusion=~\"${conclusion}\"}\n) by(run_id, name, repo, status)",
+          "expr": "sum(github_repo_workflow_runs{status=\"in_progress\"}) by(run_id, name, repo)",
           "instant": false,
-          "legendFormat": "{{run_id}} - {{repo}} - \"{{name}}\" - \"{{status}}\"",
+          "legendFormat": "{{run_id}} - {{repo}} - \"{{name}}\"",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "GitHub workflow run status",
+      "title": "GitHub workflow in_progress runs",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${source}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "min": 0,
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 8
+      },
+      "id": 5,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "10.1.10",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${source}"
+          },
+          "editorMode": "code",
+          "expr": "sum(github_repo_workflow_runs{conclusion=\"success\"})",
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Success runs",
+      "type": "gauge"
     },
     {
       "datasource": {
@@ -572,8 +539,8 @@
         "allValue": ".*",
         "current": {
           "selected": true,
-          "text": "queued",
-          "value": "queued"
+          "text": "All",
+          "value": "$__all"
         },
         "datasource": {
           "type": "prometheus",
@@ -634,6 +601,6 @@
   "timezone": "",
   "title": "GitHub Actions Exporter",
   "uid": "b2c7d375-86ab-4262-9b27-106056068a57",
-  "version": 31,
+  "version": 32,
   "weekStart": ""
 }
