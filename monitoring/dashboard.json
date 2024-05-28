@@ -282,14 +282,38 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "palette-classic"
           },
           "custom": {
-            "align": "left",
-            "cellOptions": {
-              "type": "auto"
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
             },
-            "inspect": false
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
           "min": 0,
@@ -308,17 +332,86 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 12,
+        "h": 8,
         "w": 24,
         "x": 0,
         "y": 8
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${source}"
+          },
+          "editorMode": "code",
+          "expr": "sum(\n  github_repo_workflow_runs{repo=~\"${repo}\", status=~\"${status}\", conclusion=~\"${conclusion}\"}\n) by(run_id, name, repo, status)",
+          "instant": false,
+          "legendFormat": "{{run_id}} - {{repo}} - \"{{name}}\" - \"{{status}}\"",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "GitHub workflow run status",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${source}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "left",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          },
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 16
       },
       "id": 1,
       "options": {
         "cellHeight": "sm",
         "footer": {
           "countRows": false,
-          "fields": "",
+          "fields": [],
           "reducer": [
             "sum"
           ],
@@ -388,7 +481,8 @@
           "options": {
             "excludeByName": {
               "Time": false,
-              "Value": false
+              "Value": false,
+              "run_id": false
             },
             "indexByName": {
               "Value (lastNotNull)": 5,
@@ -403,12 +497,12 @@
               "Time (last)": "Time",
               "Time (lastNotNull)": "Time",
               "Value": "Value",
-              "Value (lastNotNull)": "Total",
+              "Value (lastNotNull)": "IN",
               "Value (sum)": "",
               "conclusion": "Conclusion",
               "name": "Workflow",
               "repo": "Repository",
-              "run_id": "Id",
+              "run_id": "ID",
               "status": "Status"
             }
           }
@@ -477,9 +571,9 @@
       {
         "allValue": ".*",
         "current": {
-          "selected": false,
-          "text": "All",
-          "value": "$__all"
+          "selected": true,
+          "text": "queued",
+          "value": "queued"
         },
         "datasource": {
           "type": "prometheus",
@@ -540,6 +634,6 @@
   "timezone": "",
   "title": "GitHub Actions Exporter",
   "uid": "b2c7d375-86ab-4262-9b27-106056068a57",
-  "version": 27,
+  "version": 31,
   "weekStart": ""
 }
