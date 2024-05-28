@@ -9,11 +9,11 @@ spec:
     - name: "github-actions.rules"
       rules:
         - alert: "GitHubWorkflowRunQueued"
-          expr: 'sum(github_repo_workflow_runs{status="queued"}) by(name, repo, conclusion, status) == 1'
-          for: "15m"
+          expr: 'sum_over_time(github_repo_workflow_runs{status="queued"}[15m]) > 5'
+          for: "10m"
           labels:
             severity: "warning"
           annotations:
-            summary: 'The {{ $labels.repo }}: "{{ $labels.name }}" in ({{ $labels.status }}/{{ $labels.conclusion }}) status.'
-            description: 'The {{ $labels.repo }}: "{{ $labels.name }}" in ({{ $labels.status }}/{{ $labels.conclusion }}) status.'
+            summary: 'The repository {{ $labels.repo }} workflow "{{ $labels.name }}" run stuck in {{ $labels.status }} status.'
+            description: 'The repository {{ $labels.repo }} workflow "{{ $labels.name }}" run stuck in {{ $labels.status }} status.'
             # runbook_url: ""
