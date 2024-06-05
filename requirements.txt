@@ -1,2 +1,2 @@
-pygithub
-prometheus-client
+pygithub==2.3.0
+prometheus-client==0.20.0

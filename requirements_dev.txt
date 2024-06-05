@@ -1,5 +1,5 @@
-boto3
-flake8
-pygithub
-pip-audit
-prometheus-client
+boto3==1.34.120
+flake8==7.0.0
+pygithub==2.3.0
+pip-audit==2.7.3
+prometheus-client==0.20.0
