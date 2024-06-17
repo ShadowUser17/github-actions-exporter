@@ -23,6 +23,7 @@ from prometheus_client import start_http_server
 # GITHUB_ORG
 # GITHUB_TOKEN
 # THREAD_COUNT
+# SCRAPE_PERIOD
 # SCRAPE_INTERVAL
 
 
@@ -101,16 +102,16 @@ def start_workflows_worker(repos: queue.Queue, workflows: queue.Queue, metrics: 
         repos.task_done()
 
 
-def start_workflow_runs_worker(workflows: queue.Queue, metrics: dict) -> None:
+def start_workflow_runs_worker(workflows: queue.Queue, metrics: dict, scrape_period: int) -> None:
     logging.debug("start_workflow_runs_worker({})".format(workflows))
     github_repo_workflow_runs = metrics.get("github_repo_workflow_runs")
     github_repo_workflow_run_created = metrics.get("github_repo_workflow_run_created")
 
     while True:
         workflow = workflows.get()
-        now = datetime.datetime.now()
+        created_after = datetime.datetime.now() - datetime.timedelta(days=scrape_period)
 
-        for run in get_github_workflow_runs(workflow, created=now.strftime(r"%Y-%m-%d")):
+        for run in get_github_workflow_runs(workflow, created=created_after.strftime(r"%Y-%m-%d")):
             github_repo_workflow_runs.labels(
                 run_id=run.id,
                 name=run.name,
@@ -134,7 +135,8 @@ try:
     configure_logger()
     org = get_github_org(client=get_github_client())
     thread_count = int(os.environ.get("THREAD_COUNT", 2))
-    scrape_int = float(os.environ.get("SCRAPE_INTERVAL", "300"))
+    scrape_period = int(os.environ.get("SCRAPE_PERIOD", 3))
+    scrape_interval = float(os.environ.get("SCRAPE_INTERVAL", 300))
 
     metrics = {
         "github_repo_workflows": Gauge(
@@ -159,13 +161,13 @@ try:
     workflows = queue.Queue()
 
     start_http_endpoint()
-    workers.append(threading.Thread(target=start_repos_worker, args=(org, repos, metrics, scrape_int,)))
+    workers.append(threading.Thread(target=start_repos_worker, args=(org, repos, metrics, scrape_interval,)))
 
     for _ in range(0, thread_count):
         workers.append(threading.Thread(target=start_workflows_worker, args=(repos, workflows, metrics,)))
 
     for _ in range(0, thread_count):
-        workers.append(threading.Thread(target=start_workflow_runs_worker, args=(workflows, metrics,)))
+        workers.append(threading.Thread(target=start_workflow_runs_worker, args=(workflows, metrics, scrape_period,)))
 
     for thr in workers:
         thr.start()

@@ -55,6 +55,8 @@ spec:
               value: ""
             - name: "THREAD_COUNT"
               value: "2"
+            - name: "SCRAPE_PERIOD"
+              value: "3"
             - name: "SCRAPE_INTERVAL"
               value: "300"
           ports:
