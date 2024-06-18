@@ -84,6 +84,7 @@ def start_repos_worker(org: Organization, repos: queue.Queue, metrics: dict, scr
             time.sleep(scrape_int)
 
     except Exception:
+        logging.debug("try/except block of the start_repos_worker")
         logging.error(traceback.format_exc())
         sys.exit(1)
 
@@ -110,6 +111,7 @@ def start_workflows_worker(repos: queue.Queue, workflows: queue.Queue, metrics: 
             repos.task_done()
 
     except Exception:
+        logging.debug("try/except block of the start_workflows_worker")
         logging.error(traceback.format_exc())
         sys.exit(1)
 
@@ -145,6 +147,7 @@ def start_workflow_runs_worker(workflows: queue.Queue, metrics: dict, scrape_per
             workflows.task_done()
 
     except Exception:
+        logging.debug("try/except block of the start_workflow_runs_worker")
         logging.error(traceback.format_exc())
         sys.exit(1)
 
@@ -194,5 +197,6 @@ try:
         thr.join()
 
 except Exception:
+    logging.debug("try/except block of the main")
     logging.error(traceback.format_exc())
     sys.exit(1)
