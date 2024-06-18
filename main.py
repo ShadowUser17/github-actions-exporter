@@ -3,6 +3,7 @@ import sys
 import time
 import queue
 import logging
+import pathlib
 import datetime
 import threading
 import traceback
@@ -40,11 +41,13 @@ def get_github_client(access_token: str = "", app_id: int = 0, app_key: str = ""
 
     else:
         app_id = int(os.environ.get("GITHUB_APP_ID", app_id))
-        app_key = os.environ.get("GITHUB_APP_KEY", app_key)
-
+        app_key_file = pathlib.Path(os.environ.get("GITHUB_APP_KEY", app_key))
         logging.debug("Authenticate with GITHUB_APP_ID and GITHUB_APP_KEY")
-        git_integration = GithubIntegration(auth=Auth.AppAuth(app_id, app_key))
-        return git_integration.get_installations()[0].get_github_for_installation()
+
+        auth = Auth.AppAuth(app_id, app_key_file.read_text())
+        git_integration = GithubIntegration(auth=auth)
+        git_install_id = git_integration.get_installations()[0].id
+        return Github(auth=auth.get_installation_auth(git_install_id))
 
 
 def get_github_org(client: Github, org: str = "") -> Organization:
