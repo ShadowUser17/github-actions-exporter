@@ -9,6 +9,7 @@ import traceback
 
 from github import Auth
 from github import Github
+from github import GithubIntegration
 from github.Workflow import Workflow
 from github.Repository import Repository
 from github.WorkflowRun import WorkflowRun
@@ -22,14 +23,28 @@ from prometheus_client import start_http_server
 # HTTP_PORT
 # GITHUB_ORG
 # GITHUB_TOKEN
+# GITHUB_APP_ID
+# GITHUB_APP_KEY
 # THREAD_COUNT
 # SCRAPE_PERIOD
 # SCRAPE_INTERVAL
 
 
-def get_github_client(token: str = "") -> Github:
-    logging.debug("get_github_client({})".format(token))
-    return Github(auth=Auth.Token(os.environ.get("GITHUB_TOKEN", token)))
+def get_github_client(access_token: str = "", app_id: int = 0, app_key: str = "") -> Github:
+    logging.debug("get_github_client(..., ..., ...)")
+
+    access_token = os.environ.get("GITHUB_TOKEN", access_token)
+    if access_token:
+        logging.debug("Authenticate with GITHUB_TOKEN")
+        return Github(auth=Auth.Token(access_token))
+
+    else:
+        app_id = int(os.environ.get("GITHUB_APP_ID", app_id))
+        app_key = os.environ.get("GITHUB_APP_KEY", app_key)
+
+        logging.debug("Authenticate with GITHUB_APP_ID and GITHUB_APP_KEY")
+        git_integration = GithubIntegration(auth=Auth.AppAuth(app_id, app_key))
+        return git_integration.get_installations()[0].get_github_for_installation()
 
 
 def get_github_org(client: Github, org: str = "") -> Organization:
