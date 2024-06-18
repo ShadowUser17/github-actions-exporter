@@ -71,64 +71,82 @@ def start_http_endpoint(http_addr: str = "127.0.0.1", http_port: str = "8080") -
 
 def start_repos_worker(org: Organization, repos: queue.Queue, metrics: dict, scrape_int: float) -> None:
     logging.debug("start_repos_worker({}, {}, {})".format(org, repos, scrape_int))
-    while True:
-        for key in metrics:
-            metrics[key].clear()
 
-        for repo in get_github_repos(org, "sources"):
-            repos.put(repo)
+    try:
+        while True:
+            for key in metrics:
+                metrics[key].clear()
 
-        repos.join()
-        time.sleep(scrape_int)
+            for repo in get_github_repos(org, "sources"):
+                repos.put(repo)
+
+            repos.join()
+            time.sleep(scrape_int)
+
+    except Exception:
+        logging.error(traceback.format_exc())
+        sys.exit(1)
 
 
 def start_workflows_worker(repos: queue.Queue, workflows: queue.Queue, metrics: dict) -> None:
     logging.debug("start_workflows_worker({})".format(repos))
-    github_repo_workflows = metrics.get("github_repo_workflows")
 
-    while True:
-        repo = repos.get()
-        for workflow in get_github_repo_workflows(repo):
-            if workflow.state == "active":
-                workflows.put(workflow)
+    try:
+        github_repo_workflows = metrics.get("github_repo_workflows")
 
-            github_repo_workflows.labels(
-                workflow_id=workflow.id,
-                repo=repo.name,
-                name=workflow.name,
-                state=workflow.state
-            ).set(1)
+        while True:
+            repo = repos.get()
+            for workflow in get_github_repo_workflows(repo):
+                if workflow.state == "active":
+                    workflows.put(workflow)
 
-        repos.task_done()
+                github_repo_workflows.labels(
+                    workflow_id=workflow.id,
+                    repo=repo.name,
+                    name=workflow.name,
+                    state=workflow.state
+                ).set(1)
+
+            repos.task_done()
+
+    except Exception:
+        logging.error(traceback.format_exc())
+        sys.exit(1)
 
 
 def start_workflow_runs_worker(workflows: queue.Queue, metrics: dict, scrape_period: int) -> None:
     logging.debug("start_workflow_runs_worker({})".format(workflows))
-    github_repo_workflow_runs = metrics.get("github_repo_workflow_runs")
-    github_repo_workflow_run_created = metrics.get("github_repo_workflow_run_created")
 
-    while True:
-        workflow = workflows.get()
-        created_after = datetime.datetime.now() - datetime.timedelta(days=scrape_period)
+    try:
+        github_repo_workflow_runs = metrics.get("github_repo_workflow_runs")
+        github_repo_workflow_run_created = metrics.get("github_repo_workflow_run_created")
 
-        for run in get_github_workflow_runs(workflow, created=created_after.strftime(r"%Y-%m-%d")):
-            github_repo_workflow_runs.labels(
-                run_id=run.id,
-                name=run.name,
-                repo=run.repository.name,
-                status=run.status,
-                conclusion=run.conclusion,
-                workflow_id=run.workflow_id
-            ).set(1)
+        while True:
+            workflow = workflows.get()
+            created_after = datetime.datetime.now() - datetime.timedelta(days=scrape_period)
 
-            github_repo_workflow_run_created.labels(
-                run_id=run.id,
-                name=run.name,
-                repo=run.repository.name,
-                workflow_id=run.workflow_id
-            ).set(run.created_at.timestamp())
+            for run in get_github_workflow_runs(workflow, created=created_after.strftime(r"%Y-%m-%d")):
+                github_repo_workflow_runs.labels(
+                    run_id=run.id,
+                    name=run.name,
+                    repo=run.repository.name,
+                    status=run.status,
+                    conclusion=run.conclusion,
+                    workflow_id=run.workflow_id
+                ).set(1)
 
-        workflows.task_done()
+                github_repo_workflow_run_created.labels(
+                    run_id=run.id,
+                    name=run.name,
+                    repo=run.repository.name,
+                    workflow_id=run.workflow_id
+                ).set(run.created_at.timestamp())
+
+            workflows.task_done()
+
+    except Exception:
+        logging.error(traceback.format_exc())
+        sys.exit(1)
 
 
 try:
