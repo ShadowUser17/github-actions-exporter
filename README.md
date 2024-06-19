@@ -75,6 +75,9 @@ docker logout "${AWS_ECR_NAME}"
 kubectl create ns testing
 ```
 ```bash
+kubectl apply -f deploy/config.yml -n testing
+```
+```bash
 kubectl apply -f deploy/deploy.yml -n testing
 ```
 ```bash

@@ -38,27 +38,20 @@ spec:
     spec:
       serviceAccountName: "github-actions-exporter"
       automountServiceAccountToken: false
+      volumes:
+        - name: "keys"
+          secret:
+            secretName: "github-actions-exporter-keys"
       containers:
         - name: "github-actions-exporter"
           image: "shadowuser17/github-actions-exporter:latest"
           imagePullPolicy: "Always"
-          env:
-            - name: "DEBUG_MODE"
-              value: ""
-            - name: "HTTP_ADDR"
-              value: "0.0.0.0"
-            - name: "HTTP_PORT"
-              value: "8080"
-            - name: "GITHUB_ORG"
-              value: ""
-            - name: "GITHUB_TOKEN"
-              value: ""
-            - name: "THREAD_COUNT"
-              value: "2"
-            - name: "SCRAPE_PERIOD"
-              value: "3"
-            - name: "SCRAPE_INTERVAL"
-              value: "300"
+          envFrom:
+            - secretRef:
+                name: "github-actions-exporter-env"
+          volumeMounts:
+            - name: "keys"
+              mountPath: "/root/keys"
           ports:
             - name: "http"
               protocol: "TCP"
