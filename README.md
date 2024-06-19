@@ -75,10 +75,10 @@ docker logout "${AWS_ECR_NAME}"
 kubectl create ns testing
 ```
 ```bash
-kubectl apply -f k8s/deploy.yml -n testing
+kubectl apply -f deploy/deploy.yml -n testing
 ```
 ```bash
-kubectl apply -f k8s/monitoring.yml -n testing
+kubectl apply -f deploy/monitoring.yml -n testing
 ```
 
 #### Dependencies:
