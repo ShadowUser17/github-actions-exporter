@@ -21,8 +21,17 @@ python3 -m venv --upgrade-deps env && \
 export DEBUG_MODE=""
 export HTTP_ADDR="127.0.0.1"
 export HTTP_PORT="8080"
+```
+- Authentication with PAT:
+```bash
 export GITHUB_ORG=""
 export GITHUB_TOKEN=""
+```
+- Authentication with APP:
+```bash
+export GITHUB_ORG=""
+export GITHUB_APP_ID=""
+export GITHUB_APP_KEY=""
 ```
 ```bash
 ./env/bin/python3 main.py
