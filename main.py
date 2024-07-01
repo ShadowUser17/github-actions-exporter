@@ -1,8 +1,8 @@
 import os
-import re
 import sys
 import time
 import queue
+import base64
 import logging
 import datetime
 import threading
@@ -31,18 +31,6 @@ from prometheus_client import start_http_server
 # SCRAPE_INTERVAL
 
 
-def normalize_key(key: str) -> str:
-    logging.debug("normalize_key(...)")
-    key = key.lstrip().rstrip()
-
-    template = re.compile(r'^(-----BEGIN\s\w+\s\w+\sKEY-----)(.*)(-----END\s\w+\s\w+\sKEY-----)$')
-    tmp = list(template.findall(key)[0])
-
-    tmp[1] = tmp[1].lstrip().rstrip()
-    tmp[1] = tmp[1].replace(" ", "\n")
-    return "\n".join(tmp)
-
-
 def get_github_client(access_token: str = "", app_id: int = 0, app_key: str = "") -> Github:
     logging.debug("get_github_client(..., ..., ...)")
 
@@ -53,10 +41,10 @@ def get_github_client(access_token: str = "", app_id: int = 0, app_key: str = ""
 
     else:
         app_id = int(os.environ.get("GITHUB_APP_ID", app_id))
-        app_key = normalize_key(os.environ.get("GITHUB_APP_KEY", app_key))
+        app_key = base64.b64decode(os.environ.get("GITHUB_APP_KEY", app_key))
         logging.debug("Authenticate with GITHUB_APP_ID and GITHUB_APP_KEY")
 
-        auth = Auth.AppAuth(app_id, app_key)
+        auth = Auth.AppAuth(app_id, app_key.decode())
         git_integration = GithubIntegration(auth=auth)
         git_install_id = git_integration.get_installations()[0].id
         return Github(auth=auth.get_installation_auth(git_install_id))
