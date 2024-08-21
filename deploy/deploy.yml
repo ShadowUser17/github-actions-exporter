@@ -49,3 +49,21 @@ spec:
             - name: "http"
               protocol: "TCP"
               containerPort: 8080
+          resources:
+            requests:
+              memory: "64Mi"
+          readinessProbe:
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            periodSeconds: 10
+            httpGet:
+              path: "/metrics"
+              port: "http"
+          livenessProbe:
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            periodSeconds: 10
+            httpGet:
+              path: "/metrics"
+              port: "http"
+
