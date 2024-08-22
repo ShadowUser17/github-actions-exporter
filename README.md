@@ -49,10 +49,10 @@ docker build -t "shadowuser17/github-actions-exporter:testing" .
 
 #### Scan docker image:
 ```bash
-dockle "shadowuser17/github-actions-exporter:latest"
+dockle "shadowuser17/github-actions-exporter:testing"
 ```
 ```bash
-trivy image "shadowuser17/github-actions-exporter:latest"
+trivy image "shadowuser17/github-actions-exporter:testing"
 ```
 
 #### Publish docker image:
@@ -61,6 +61,9 @@ docker login -u "${DOCKERHUB_LOGIN}" -p "${DOCKERHUB_TOKEN}"
 ```
 ```bash
 docker push "shadowuser17/github-actions-exporter:latest"
+```
+```bash
+docker push "shadowuser17/github-actions-exporter:testing"
 ```
 
 #### Publish docker image to AWS/ECR:
