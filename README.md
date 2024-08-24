@@ -38,13 +38,17 @@ export GITHUB_APP_KEY=""
 ```
 
 #### Build docker image:
-- Stable version:
+- Prune build cache:
 ```bash
-docker build -t "shadowuser17/github-actions-exporter:latest" .
+earthly prune
 ```
-- Testing version:
+- Build stable version:
 ```bash
-docker build -t "shadowuser17/github-actions-exporter:testing" .
+earthly +all --tag="latest"
+```
+- Build testing version:
+```bash
+earthly +all --tag="testing"
 ```
 
 #### Scan docker image:
@@ -60,10 +64,10 @@ trivy image "shadowuser17/github-actions-exporter:testing"
 docker login -u "${DOCKERHUB_LOGIN}" -p "${DOCKERHUB_TOKEN}"
 ```
 ```bash
-docker push "shadowuser17/github-actions-exporter:latest"
+earthly --push +all --tag="latest"
 ```
 ```bash
-docker push "shadowuser17/github-actions-exporter:testing"
+earthly --push +all --tag="testing"
 ```
 
 #### Publish docker image to AWS/ECR:
