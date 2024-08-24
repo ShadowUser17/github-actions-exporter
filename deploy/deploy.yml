@@ -66,4 +66,3 @@ spec:
             httpGet:
               path: "/metrics"
               port: "http"
-
