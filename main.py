@@ -145,7 +145,8 @@ def start_workflow_runs_worker(workflows: queue.Queue, metrics: dict, scrape_per
             workflow = workflows.get()
             created_after = datetime.datetime.now() - datetime.timedelta(days=scrape_period)
 
-            for run in get_github_workflow_runs(workflow, created=created_after.strftime(r"%Y-%m-%d")):
+            # https://docs.github.com/en/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates
+            for run in get_github_workflow_runs(workflow, created=created_after.strftime(r">=%Y-%m-%d")):
                 github_repo_workflow_runs.labels(
                     run_id=run.id,
                     name=run.name,
