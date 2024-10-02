@@ -147,6 +147,10 @@ def start_workflow_runs_worker(workflows: queue.Queue, metrics: dict, scrape_per
 
             # https://docs.github.com/en/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates
             for run in get_github_workflow_runs(workflow, created=created_after.strftime(r">=%Y-%m-%d")):
+                logging.debug("github_repo_workflow_runs.labels({}, {}, {}, {}, {}, {})".format(
+                    run.id, run.name, run.repository.name, run.status, run.conclusion, run.workflow_id
+                ))
+
                 github_repo_workflow_runs.labels(
                     run_id=run.id,
                     name=run.name,
@@ -155,6 +159,10 @@ def start_workflow_runs_worker(workflows: queue.Queue, metrics: dict, scrape_per
                     conclusion=run.conclusion,
                     workflow_id=run.workflow_id
                 ).set(1)
+
+                logging.debug("github_repo_workflow_run_created.labels({}, {}, {}, {})".format(
+                    run.id, run.name, run.repository.name, run.workflow_id
+                ))
 
                 github_repo_workflow_run_created.labels(
                     run_id=run.id,
