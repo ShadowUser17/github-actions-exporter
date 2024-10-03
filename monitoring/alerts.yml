@@ -19,7 +19,7 @@ spec:
             # runbook_url: ""
 
         - alert: "GitHubWorkflowsMetricIsAbsent"
-          expr: 'absent_over_time(github_repo_workflows{job=~".*/github-actions-exporter"}[15m]) == 1'
+          expr: 'absent_over_time(github_repo_workflows{job=~".*/github-actions-exporter"}[10m]) == 1'
           for: "10m"
           labels:
             severity: "error"
@@ -29,7 +29,7 @@ spec:
             # runbook_url: ""
 
         - alert: "GitHubWorkflowsMetricIsAbsent"
-          expr: 'absent_over_time(github_repo_workflow_runs{job=~".*/github-actions-exporter"}[15m]) == 1'
+          expr: 'absent_over_time(github_repo_workflow_runs{job=~".*/github-actions-exporter"}[10m]) == 1'
           for: "10m"
           labels:
             severity: "error"
