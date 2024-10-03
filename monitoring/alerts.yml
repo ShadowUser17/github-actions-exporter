@@ -12,8 +12,28 @@ spec:
           expr: 'sum_over_time(github_repo_workflow_runs{status="queued"}[15m]) > 5'
           for: "10m"
           labels:
-            severity: "warning"
+            severity: "error"
           annotations:
             summary: 'The repository {{ $labels.repo }} workflow "{{ $labels.name }}" run stuck in {{ $labels.status }} status.'
             description: 'The repository {{ $labels.repo }} workflow "{{ $labels.name }}" run stuck in {{ $labels.status }} status.'
+            # runbook_url: ""
+
+        - alert: "GitHubWorkflowsMetricIsAbsent"
+          expr: 'absent_over_time(github_repo_workflows{job=~".*/github-actions-exporter"}[15m]) == 1'
+          for: "10m"
+          labels:
+            severity: "error"
+          annotations:
+            summary: 'The github_repo_workflows metric is absent.'
+            description: 'The github_repo_workflows metric is absent.'
+            # runbook_url: ""
+
+        - alert: "GitHubWorkflowsMetricIsAbsent"
+          expr: 'absent_over_time(github_repo_workflow_runs{job=~".*/github-actions-exporter"}[15m]) == 1'
+          for: "10m"
+          labels:
+            severity: "error"
+          annotations:
+            summary: 'The github_repo_workflow_runs metric is absent.'
+            description: 'The github_repo_workflow_runs metric is absent.'
             # runbook_url: ""
